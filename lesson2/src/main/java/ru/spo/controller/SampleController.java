@@ -15,9 +15,9 @@ public class SampleController {
     }
 
 
-    @RequestMapping(value = "/bye", method = RequestMethod.GET)
+    @RequestMapping(value = "/zzz", method = RequestMethod.GET)
     public String bye(Model model){
-        model.addAttribute("message", "Welcome to bloody enterprise");
+        model.addAttribute("message", "zzz");
         return "index";
     }
 

@@ -14,7 +14,7 @@ public class IndexController {
         model.addAttribute("message", "My message plus random UUID 1-> " + UUID.randomUUID());
         return "index";
     }
-
+//...
     @GetMapping("/hello")
     public String index2(Model model){
         model.addAttribute("message", "HELLO " + UUID.randomUUID());
