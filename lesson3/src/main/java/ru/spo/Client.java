@@ -1,6 +1,7 @@
 package ru.spo;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name="clients")
@@ -11,10 +12,21 @@ public class Client {
     private long id;
     private String name;
 
-   /* private Order order;*/
+    public Order getOrder() {
+        return order;
+    }
 
-    public Client() {
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
+    @OneToOne
+    @JoinColumn
+    private Order order;
+
+    public Client(long id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
     public long getId() {
@@ -33,11 +45,4 @@ public class Client {
         this.name = name;
     }
 
-   /* public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }*/
 }

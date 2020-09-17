@@ -1,12 +1,14 @@
 package ru.spo;
 
-import javassist.tools.reflect.CannotCreateException;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
@@ -14,39 +16,69 @@ public class App {
         EntityManagerFactory entytyFactory = new Configuration()
                 .configure("hibernate.xml")
                 .buildSessionFactory();
+
         EntityManager entityManager = entytyFactory.createEntityManager();
 
-        Client client = new Client();
+        entityManager.getTransaction().begin();
+        String[] clientsArray = new String[]{"lisa", "olga", "ivan"};
+        for (String name : clientsArray) {
+            Client client = new Client(0, name);
+            entityManager.persist(client);
+        }
 
-        client.setName("Ivan");
-        createEntity(entityManager, client);
+        Product[] productsArray = new Product[]{
+                new Product(0, "bread", 50.2),
+                new Product(0, "milk", 88.8),
+                new Product(0, "sugar", 35.6),
+                new Product(0, "tea", 65.8),
+                new Product(0, "honey", 130.4),
+        };
 
-        Client client1 = new Client();
+        for (Product product : productsArray) {
+            entityManager.persist(product);
+        }
+        entityManager.getTransaction().commit();
 
-        client1.setName("Igor");
-        createEntity(entityManager, client1);
-        Product milk = new Product();
+        List<Client> clients = entityManager.createQuery("SELECT client FROM Client client", Client.class).getResultList();
+        List<Product> products = entityManager.createQuery("SELECT product FROM Product product", Product.class).getResultList();
 
-        milk.setName("milk");
-        createEntity(entityManager, milk);
-        Product bread = new Product();
-
-        bread.setName("bread");
-        createEntity(entityManager, bread);
         List<Product> productList = new ArrayList<>();
-        productList.add(milk);
-        productList.add(bread);
+        productList.add(products.get(1));
+        productList.add(products.get(2));
+        productList.add(products.get(3));
 
-        Order order = new Order();
-        order.setClient(client);
-        order.setProductList(productList);
-        createEntity(entityManager, order);
+        entityManager.getTransaction().begin();
+        Order order = new Order(0, clients.get(0), productList);
+        entityManager.persist(order);
 
-        Order order1 = new Order();
-        order1.setClient(client1);
-        order1.setProductList(productList);
-        createEntity(entityManager,order1);
+        List<Product> productList2 = new ArrayList<>();
+        productList2.add(products.get(4));
+        productList2.add(products.get(0));
+        productList2.add(products.get(3));
+
+        Order order2 = new Order(0, clients.get(2), productList2);
+        entityManager.persist(order2);
+        entityManager.getTransaction().commit();
+        List<Order> orders = entityManager.createQuery("SELECT order FROM Order order", Order.class).getResultList();
+        clients = entityManager.createQuery("SELECT client FROM Client client", Client.class).getResultList();
+
+
+        System.out.println("Orders list");
+
+        for (Order ord : orders) {
+            System.out.println("Order #" + ord.getId() + " client: " + ord.getClient().getName());
+            for (int i = 0; i < ord.getProductList().size(); i++) {
+                System.out.println(ord.getProductList().get(i).getName());
+            }
+        }
+        System.out.println();
+
+
     }
+
+
+
+
     private static <T> void createEntity(EntityManager em, T entity){
 
         System.out.println("Creating entity");
@@ -58,6 +90,8 @@ public class App {
         em.getTransaction().commit();
 
         System.out.println("Creating finished");
+
+
 
     }
 
@@ -82,5 +116,14 @@ public class App {
         System.out.println("Saving completed->" + savedEntity);
 
         return savedEntity;
+    }
+
+    private static <T> void deleteEntity(EntityManager em, T entity) {
+        System.out.println("Start removing");
+        em.getTransaction().begin();
+        em.remove(entity);
+        em.getTransaction().commit();
+        System.out.println("Removing completed->");
+
     }
 }

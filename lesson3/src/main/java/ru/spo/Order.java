@@ -16,11 +16,19 @@ public class Order {
     private Client client;
 
     @ManyToMany
-    @JoinColumn
+    @JoinTable(name="orders_products_list",
+    joinColumns = @JoinColumn(name="order_id"),
+    inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> productList;
 
     public Order() {
 
+    }
+
+    public Order(long id, Client client, List<Product> productList) {
+        this.id = id;
+        this.client = client;
+        this.productList = productList;
     }
 
     public void setId(long id) {
@@ -31,16 +39,16 @@ public class Order {
         this.client = client;
     }
 
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
-    }
-
     public long getId() {
         return id;
     }
 
     public Client getClient() {
         return client;
+    }
+
+    public void setProductList(List<Product> productList) {
+        this.productList = productList;
     }
 
     public List<Product> getProductList() {
