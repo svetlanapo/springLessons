@@ -21,9 +21,6 @@ public class Order {
     inverseJoinColumns = @JoinColumn(name = "product_id"))
     private List<Product> productList;
 
-    public Order() {
-
-    }
 
     public Order(long id, Client client, List<Product> productList) {
         this.id = id;
